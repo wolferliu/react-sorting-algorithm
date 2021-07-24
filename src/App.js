@@ -8,7 +8,7 @@ import {
   initRandomArray,
   selectionSort
 } from "./sorting";
-const numberInArray = 12;
+const numberInArray = 8;
 
 function TheBars(props) {
   const h = props.highlighting;
@@ -59,48 +59,62 @@ export default function App() {
     initRandomArray(2, 30, numberInArray)
   );
   const [highlight, setHighlight] = useState([]);
+  const isRunning = useRef(false);
   const actionIndexRef = useRef(0);
   const sortActions = useRef([]);
 
   const handleSelectionSort = () => {
     sortActions.current = selectionSort(numberList);
+    actionIndexRef.current = 0;
     alert("Sorting is finished, you can show the steps now.");
   };
 
   const handleBubbleSort = () => {
     sortActions.current = bubbleSort(numberList);
+    actionIndexRef.current = 0;
     alert("Sorting is finished, you can show the steps now.");
   };
 
   const handleShowIt = () => {
-    actionIndexRef.current = 0;
+    isRunning.current = true;
     setTimeout(showNextAction, 500);
   };
+  const handlePauseIt = () => {
+    isRunning.current = false;
+  };
+
   const showNextAction = () => {
     const item = sortActions.current[actionIndexRef.current];
     if (item.action === ACTION_HIGHLIGHT) {
       setHighlight([...item.payload]);
     } else {
-      console.log(actionIndexRef.current);
-      console.log(item.action + " " + item.payload);
+      // console.log(actionIndexRef.current);
+      // console.log(item.action + " " + item.payload);
       setNumberList((prevList) =>
         swapAndReturn(prevList, item.payload[0], item.payload[1])
       );
     }
     actionIndexRef.current = actionIndexRef.current + 1;
     if (actionIndexRef.current < sortActions.current.length) {
+      // console.log("running=" + isRunning.current);
+      if (!isRunning.current) {
+        return;
+      }
       setTimeout(showNextAction, item.delay);
     } else {
       setTimeout(() => {
         setHighlight([]);
       }, 500);
+      isRunning.current = false;
       alert("Done.");
     }
   };
+
   const handleReset = () => {
     setNumberList(initRandomArray(2, 30, numberInArray));
     setHighlight([]);
     actionIndexRef.current = 0;
+    isRunning.current = false;
   };
 
   return (
@@ -111,6 +125,7 @@ export default function App() {
       <button onClick={handleBubbleSort}>Bubble Sort</button>
       <br />
       <button onClick={handleShowIt}>Show the steps</button>
+      <button onClick={handlePauseIt}>Pause</button>
       <button onClick={handleReset}>Reset</button>
     </div>
   );
