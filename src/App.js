@@ -8,7 +8,7 @@ import {
   initRandomArray,
   selectionSort
 } from "./sorting";
-const numberInArray = 8;
+const numberInArray = 10;
 
 function TheBars(props) {
   const h = props.highlighting;
